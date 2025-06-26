@@ -1,0 +1,51 @@
+.table-container {
+    position: relative;
+}
+
+.loader-overlay {
+    text-align: center;
+    padding: 1rem;
+    width: 100vw;
+}
+
+button[disabled] {
+    cursor: not-allowed;
+}
+
+.custom-pill {
+    background-color: #635f5f;
+    border: none;
+    border-radius: 25px;
+    padding: 0.25rem 0.75rem;
+}
+
+.custom-pill-label {
+    color: #FFFFFF;
+    font-size: 0.875rem;
+}
+
+.custom-pill-close {
+    background-color: #FFFFFF;
+    color: #4A4A4A;
+    border-radius: 50%;
+    border: none;
+    width: 1rem;
+    height: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0.2rem;
+}
+
+.custom-pill-close:hover {
+    opacity: 0.8;
+}
+.align-bottom {
+    vertical-align:bottom;
+}
+.spinner-message {
+  position: relative;
+  z-index: 1001;        
+  margin-top: 3rem;
+}

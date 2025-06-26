@@ -1,0 +1,66 @@
+<template>
+    <lightning-card title="Outreach Report Configuration">
+        <lightning-layout multiple-rows>
+
+            <lightning-layout-item size="12">
+                <lightning-layout multiple-rows>
+
+                    <lightning-layout-item padding="around-small" size="12" medium-device-size="6">
+                        <lightning-dual-listbox name="userSelection" source-label="Available Users"
+                            selected-label="Selected Users" options={userOptions} value={selectedUserIds}
+                            onchange={handleUserChange}>
+                        </lightning-dual-listbox>
+                    </lightning-layout-item>
+
+                    <lightning-layout-item padding="around-small" size="12" medium-device-size="6">
+                        <lightning-dual-listbox name="gridSelection" source-label="Available Grids"
+                            selected-label="Selected Grids" options={gridSuggestions} value={selectedGridIds}
+                            onchange={handleGridSelect}>
+                        </lightning-dual-listbox>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </lightning-layout-item>
+
+            <template if:true={showResetButton}>
+
+                <lightning-layout-item size="12" class="slds-p-horizontal_small">
+                    <lightning-button label="Reset Selection" icon-name="action:reset_password" alternative-text="Reset"
+                        title="Reset Selection" onclick={handleReset}
+                        class="slds-m-right_large slds-m-top_large"></lightning-button>
+                </lightning-layout-item>
+
+            </template>
+        </lightning-layout>
+
+        <template if:true={summaryGridData}>
+            <div class="slds-m-around_medium">
+                <p class="slds-text-heading_medium slds-m-bottom_small">
+                    <strong>Outreach Summary Report</strong>
+                </p>
+                <!-- Summary Totals Section -->
+                <div class="slds-grid slds-gutters slds-m-bottom_medium">
+                    <template for:each={columnTotals} for:item="total">
+                        <div key={total.label} class="slds-col">
+                            <div class="slds-box slds-box_small slds-theme_shade">
+                                <p class="slds-text-heading_small">{total.label}</p>
+                                <p class="slds-text-heading_medium">{total.value}</p>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                
+                <lightning-datatable 
+                    key-field="accountName" 
+                    data={summaryGridData} 
+                    columns={outreachReportcolumn}
+                    hide-checkbox-column 
+                    class="slds-table slds-table_bordered slds-table_striped"
+                    show-row-number-column 
+                    sorted-by={sortBy} 
+                    sorted-direction={sortDirection} 
+                    onsort={handleSortData}>
+                </lightning-datatable>
+            </div>
+        </template>
+    </lightning-card>
+</template>
