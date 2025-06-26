@@ -1,0 +1,43 @@
+<template>
+    <lightning-modal-header>
+        <h2 class="slds-text-heading_medium">Reset Cognism Redeem Details</h2>
+    </lightning-modal-header>
+
+    <lightning-modal-body class="slds-p-around_medium">
+        <p class="slds-m-bottom_medium">Are you sure you want to reset cognism redeem details?</p>
+        <lightning-input 
+            label="New Cognism Redeem Count" 
+            value={newCognismRedeemCount} 
+            onchange={handleInputChange} 
+            class="slds-m-bottom_small" 
+            placeholder="Enter new cognism redeem count" 
+            style="width:40%;" 
+            required>
+        </lightning-input>
+        <lightning-input 
+            type="date" 
+            label="Start Date" 
+            value={startDate} 
+            onchange={handleStartDateChange} 
+            placeholder="Enter start date"
+            class="slds-m-bottom_small" 
+            style="width:40%;" 
+            required>
+        </lightning-input>
+        <lightning-input 
+            type="date" 
+            label="End Date" 
+            value={endDate} 
+            onchange={handleEndDateChange} 
+            placeholder="Enter end date"
+            class="slds-m-bottom_small" 
+            style="width:40%;" 
+            required>
+        </lightning-input>
+    </lightning-modal-body>
+    
+    <lightning-modal-footer>
+        <lightning-button variant="neutral" label="Cancel" onclick={handleCancel} class="slds-m-right_medium"></lightning-button>
+        <lightning-button variant="brand" label="Yes, Reset" onclick={handleReset}></lightning-button>
+    </lightning-modal-footer>
+</template>

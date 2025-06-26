@@ -1,0 +1,1232 @@
+<template>
+    <div class="slds-align_absolute-center slds-p-around_xx-small">
+        <div class="slds-button_group">
+            <template if:true={showSalesforceButton}>
+                <lightning-button label="Create Grid for existing SF accounts" variant="brand"
+                    onclick={handleshowAccountSelectionPageSF} disabled={showSFBtnDisabled}>
+                </lightning-button>
+            </template>
+
+            <template if:true={showSalesNavigatorButton}>
+                <lightning-button label="Find new Accounts to add to SalesForce" variant="brand"
+                    onclick={handleshowAccountSelectionPageSN} class="slds-m-left_small" disabled={showSNBtnDisabled}>
+                </lightning-button>
+            </template>
+        </div>
+    </div>
+    <template if:true={showAccountSelectionPageSF}>
+        <div class="custom-my-grid-setup-page">
+            <lightning-card>
+                <div class="slds-grid slds-grid_align-spread slds-m-bottom_xx-small slds-p-horizontal_small">
+                    <h3 id="searching-with-table-label" class="slds-text-heading_medium">
+                        <strong>Account Search In Salesforce</strong>
+                    </h3>
+                    <lightning-button-icon icon-name="utility:close" alternative-text="Close" variant="bare"
+                        onclick={handleCloseSFSearchPage} class="slds-m-left_x-small">
+                    </lightning-button-icon>
+                </div>
+                <div class="slds-box slds-theme_shade slds-p-around_medium">
+                    <div class="slds-grid slds-wrap slds-gutters">
+                        <div class="slds-col slds-size_1-of-2">
+                            <h2><strong>Account Industry</strong></h2>
+                            <lightning-input type="text" label="Search Industry" value={searchAccounts}
+                                onchange={handleAccountsSearch} placeholder="Type account industry to search..."
+                                required>
+                            </lightning-input>
+                            <template if:true={filteredIndustryOptions.length}>
+                                <ul class="slds-box slds-m-top_small slds-list_horizontal slds-wrap slds-scrollable_y"
+                                    style="max-height: 150px;">
+                                    <template for:each={filteredIndustryOptions} for:item="option">
+                                        <li key={option.value}
+                                            class="slds-p-around_x-small slds-m-right_x-small slds-border_radius slds-border_bottom hover-option"
+                                            onclick={handleIndustrySelect} data-value={option.value}
+                                            data-label={option.label}>
+                                            {option.label}
+                                        </li>
+                                    </template>
+                                </ul>
+                            </template>
+                            <template if:true={selectedIndustries.length}>
+                                <div class="slds-m-top_small">
+                                    <h3><strong>Selected Industry</strong></h3>
+                                    <div class="slds-list_horizontal slds-wrap">
+                                        <template for:each={selectedIndustries} for:item="industry">
+                                            <span key={industry} class="slds-pill custom-pill slds-m-right_x-small">
+                                                <span class="slds-pill__label custom-pill-label">{industry}</span>
+                                                <lightning-button-icon icon-name="utility:close" variant="bare"
+                                                    alternative-text="Remove"
+                                                    class="slds-m-left_x-small custom-pill-close" data-value={industry}
+                                                    onclick={handleIndustryRemove}>
+                                                </lightning-button-icon>
+                                            </span>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <h2><strong>Account Owner</strong></h2>
+                            <lightning-input type="text" label="Search Account Owner" value={searchAccountOwner}
+                                onchange={handleAccountOwnerSearch} placeholder="Type account owner name to search..."
+                                required>
+                            </lightning-input>
+                            <template if:true={filteredAccountOwnerOptions.length}>
+                                <ul class="slds-box slds-m-top_small slds-list_horizontal slds-wrap slds-scrollable_y"
+                                    style="max-height: 150px;">
+                                    <template for:each={filteredAccountOwnerOptions} for:item="option">
+                                        <li key={option.value}
+                                            class="slds-p-around_x-small slds-m-right_x-small slds-border_radius slds-border_bottom hover-option"
+                                            onclick={handleAccountOwnerSelect} data-value={option.value}>
+                                            {option.label}
+                                        </li>
+                                    </template>
+                                </ul>
+                            </template>
+                            <template if:true={selectedAccountOwner}>
+                                <div class="slds-m-top_small">
+                                    <h3><strong>Selected Account Owner</strong></h3>
+                                    <div class="slds-pill_container" style="background-color: transparent; border:none">
+                                        <span class="slds-pill custom-pill">
+                                            <span
+                                                class="slds-pill__label custom-pill-label">{selectedAccountOwner.label}</span>
+                                            <lightning-button-icon icon-name="utility:close" alternative-text="Remove"
+                                                variant="bare" class="slds-m-left_x-small custom-pill-close"
+                                                onclick={handleAccountOwnerRemove}>
+                                            </lightning-button-icon>
+                                        </span>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-box slds-theme_shade slds-p-around_medium">
+                    <div class="slds-grid slds-wrap slds-gutters">
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-combobox name="Select Account Revenue" label="Select Account Revenue"
+                                placeholder="Select revenue range" options={accountRevenue} value={selectedRevenueValue}
+                                onchange={handleAccountRevenue}>
+                            </lightning-combobox>
+                            <template if:true={selectedRevenues.length}>
+                                <div>
+                                    <h3><strong>Selected Account Revenue</strong></h3>
+                                    <div class="slds-pill_container" style="background-color: transparent; border:none">
+                                        <template for:each={selectedRevenues} for:item="revenue">
+                                            <span key={revenue.value}
+                                                class="slds-pill custom-pill slds-m-right_x-small">
+                                                <span class="slds-pill__label custom-pill-label">{revenue.label}</span>
+                                                <lightning-button-icon icon-name="utility:close"
+                                                    alternative-text="Remove" variant="bare"
+                                                    class="slds-m-left_x-small custom-pill-close"
+                                                    data-value={revenue.value} onclick={handleRevenueRemove}>
+                                                </lightning-button-icon>
+                                            </span>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-combobox name="Select Account Head Count" label="Select Account Head Count"
+                                placeholder="Select head count range" options={accountHeadCount}
+                                value={selectedHeadCountsValue} onchange={handleAccountHeadCount}>
+                            </lightning-combobox>
+                            <template if:true={selectedHeadCounts.length}>
+                                <div class="slds-m-top_small">
+                                    <h3><strong>Selected Account Head Count</strong></h3>
+                                    <div class="slds-pill_container" style="background-color: transparent; border:none">
+                                        <template for:each={selectedHeadCounts} for:item="headCount">
+                                            <span key={headCount.value}
+                                                class="slds-pill custom-pill slds-m-right_x-small">
+                                                <span
+                                                    class="slds-pill__label custom-pill-label">{headCount.label}</span>
+                                                <lightning-button-icon icon-name="utility:close"
+                                                    alternative-text="Remove" variant="bare"
+                                                    class="slds-m-left_x-small custom-pill-close"
+                                                    data-value={headCount.value} onclick={handleAccountHeadCountRemove}>
+                                                </lightning-button-icon>
+                                            </span>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-grid slds-p-around_xx-small slds-align-middle">
+                    <div class="slds-col slds-size_1-of-3"></div>
+                    <div class="slds-col slds-size_1-of-3 slds-text-align_center">
+                        <lightning-button label="Search Accounts In Salesforce" variant="brand"
+                            onclick={handleSearchAccountClick}>
+                        </lightning-button>
+                        <lightning-button label="Reset" variant="neutral" onclick={handleReset}
+                            class="slds-m-left_small">
+                        </lightning-button>
+                    </div>
+                    <div class="slds-col slds-size_1-of-3 slds-text-align_right">
+                        <lightning-button label="Back" variant="neutral" onclick={handleCloseSFSearchPage}>
+                        </lightning-button>
+                    </div>
+                </div>
+                <template if:true={errorMessage}>
+                    <div class="error">{errorMessage}</div>
+                </template>
+            </lightning-card>
+        </div>
+    </template>
+    <template if:true={showAccountSelectionPageSN}>
+        <div class="custom-my-grid-setup-page">
+            <lightning-card>
+                <div class="slds-grid slds-grid_align-spread slds-m-bottom_xx-small slds-p-horizontal_small">
+                    <h3 id="searching-salesnavigator-table-label" class="slds-text-heading_medium">
+                        <strong>Account Search In Sales Navigator</strong>
+                    </h3>
+                    <lightning-button-icon icon-name="utility:close" alternative-text="Close"
+                        onclick={handleCloseSNSearchPage} variant="bare">
+                    </lightning-button-icon>
+                </div>
+                <div class="slds-box slds-theme_shade slds-p-around_medium">
+                    <div class="slds-grid slds-wrap slds-gutters">
+                        <div class="slds-col slds-size_1-of-2">
+                            <h2><strong>Account Industry</strong></h2>
+                            <lightning-input type="text" label="Search" value={searchSNIndustryTerm}
+                                onchange={handleSNIndustrySearch} placeholder="Type to search..."
+                                required></lightning-input>
+                            <template if:true={filteredIndustrySNOptions.length}>
+                                <ul class="slds-box slds-m-top_small">
+                                    <template for:each={filteredIndustrySNOptions} for:item="option">
+                                        <li key={option.id}
+                                            class="slds-p-around_x-small slds-border_bottom hover-option"
+                                            onclick={handleSNIndustrySelect} data-value={option.id}
+                                            data-label={option.title}>
+                                            {option.title}
+                                        </li>
+                                    </template>
+                                </ul>
+                            </template>
+                            <template if:true={selectedIndustrySN.length}>
+                                <div class="slds-m-top_small slds-text-align_left">
+                                    <h3>Selected Industry</h3>
+                                    <ul class="slds-list_horizontal slds-wrap">
+                                        <template for:each={selectedIndustrySN} for:item="industry">
+                                            <span class="custom-pill" key={industry.id}>
+                                                <li class="custom-pill-label slds-grid slds-grid_vertical-align-center">
+                                                    {industry.title}
+                                                    <lightning-button-icon icon-name="utility:close"
+                                                        alternative-text="Remove" variant="bare"
+                                                        class="slds-m-left_small custom-pill-close"
+                                                        data-value={industry.id} onclick={handleSNIndustryRemove}>
+                                                    </lightning-button-icon>
+                                                </li>
+                                            </span>
+                                        </template>
+                                    </ul>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <h2><strong>Account HQ Location</strong></h2>
+                            <lightning-input type="text" label="Search" value={searchTerm} onchange={handleRegionSearch}
+                                placeholder="Type to search..." required></lightning-input>
+                            <template if:true={filteredOptions.length}>
+                                <ul class="slds-box slds-m-top_small">
+                                    <template for:each={filteredOptions} for:item="option">
+                                        <li key={option.id}
+                                            class="slds-p-around_x-small slds-border_bottom hover-option"
+                                            onclick={handleRegionSelect} data-value={option.id}
+                                            data-label={option.title}>
+                                            {option.title}
+                                        </li>
+                                    </template>
+                                </ul>
+                            </template>
+                            <template if:true={selectedRegions.length}>
+                                <div class="slds-m-top_small slds-text-align_left">
+                                    <h3>Selected HQ Locations</h3>
+                                    <ul class="slds-list_horizontal slds-wrap">
+                                        <template for:each={selectedRegions} for:item="region">
+                                            <span class="custom-pill" key={region.id}>
+                                                <li class="custom-pill-label slds-grid slds-grid_vertical-align-center">
+                                                    {region.title}
+                                                    <lightning-button-icon icon-name="utility:close"
+                                                        alternative-text="Remove" variant="bare"
+                                                        class="slds-m-left_small custom-pill-close"
+                                                        data-value={region.id} onclick={handleRegionRemove}>
+                                                    </lightning-button-icon>
+                                                </li>
+                                            </span>
+                                        </template>
+                                    </ul>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slds-box slds-theme_shade slds-p-around_medium">
+                    <div class="slds-grid slds-wrap slds-gutters">
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-combobox name="Select Account Revenue" label="Select Account Revenue"
+                                placeholder="Select revenue range" options={accountRevenue} value={selectedRevenueValue}
+                                onchange={handleAccountRevenue} required>
+                            </lightning-combobox>
+                            <template if:true={selectedRevenues.length}>
+                                <div>
+                                    <h3><strong>Selected Account Revenue</strong></h3>
+                                    <div class="slds-pill_container" style="background-color: transparent; border:none">
+                                        <template for:each={selectedRevenues} for:item="revenue">
+                                            <span key={revenue.value}
+                                                class="slds-pill custom-pill slds-m-right_x-small">
+                                                <span class="slds-pill__label custom-pill-label">{revenue.label}</span>
+                                                <lightning-button-icon icon-name="utility:close"
+                                                    alternative-text="Remove" variant="bare"
+                                                    class="slds-m-left_x-small custom-pill-close"
+                                                    data-value={revenue.value} onclick={handleRevenueRemove}>
+                                                </lightning-button-icon>
+                                            </span>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-combobox name="Select Account Head Count" label="Select Account Head Count"
+                                placeholder="Select head count range" options={accountHeadCount}
+                                value={selectedHeadCountsValue} onchange={handleAccountHeadCount} required>
+                            </lightning-combobox>
+                            <template if:true={selectedHeadCounts.length}>
+                                <div class="slds-m-top_small">
+                                    <h3><strong>Selected Account Head Count</strong></h3>
+                                    <div class="slds-pill_container" style="background-color: transparent; border:none">
+                                        <template for:each={selectedHeadCounts} for:item="headCount">
+                                            <span key={headCount.value}
+                                                class="slds-pill custom-pill slds-m-right_x-small">
+                                                <span
+                                                    class="slds-pill__label custom-pill-label">{headCount.label}</span>
+                                                <lightning-button-icon icon-name="utility:close"
+                                                    alternative-text="Remove" variant="bare"
+                                                    class="slds-m-left_x-small custom-pill-close"
+                                                    data-value={headCount.value} onclick={handleAccountHeadCountRemove}>
+                                                </lightning-button-icon>
+                                            </span>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slds-box slds-theme_shade slds-p-around_medium">
+                    <div class="slds-grid slds-wrap slds-gutters">
+                        <div class="slds-col slds-size_1-of-2">
+                            <h2><strong>Search Company</strong></h2>
+                            <lightning-input type="text" label="Search" value={searchSNCompanyTerm}
+                                onchange={handleSNCompanySearch} placeholder="Type to search..."></lightning-input>
+                            <template if:true={filteredCompanySNOptions.length}>
+                                <ul class="slds-box slds-m-top_small">
+                                    <template for:each={filteredCompanySNOptions} for:item="option">
+                                        <li key={option.id}
+                                            class="slds-p-around_x-small slds-border_bottom hover-option"
+                                            onclick={handleSNCompanySelect} data-value={option.id}
+                                            data-label={option.name}>
+                                            {option.name}
+                                        </li>
+                                    </template>
+                                </ul>
+                            </template>
+                            <template if:true={selectedCompanySN.length}>
+                                <div class="slds-m-top_small slds-text-align_left">
+                                    <h3>Selected Companies</h3>
+                                    <ul class="slds-list_horizontal slds-wrap">
+                                        <template for:each={selectedCompanySN} for:item="company">
+                                            <span class="custom-pill" key={company.id}>
+                                                <li class="custom-pill-label slds-grid slds-grid_vertical-align-center">
+                                                    {company.name}
+                                                    <lightning-button-icon icon-name="utility:close"
+                                                        alternative-text="Remove" variant="bare"
+                                                        class="slds-m-left_small custom-pill-close"
+                                                        data-value={company.id} onclick={handleSNCompanyRemove}>
+                                                    </lightning-button-icon>
+                                                </li>
+                                            </span>
+                                        </template>
+                                    </ul>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slds-grid slds-p-around_xx-small slds-align-middle">
+                    <div class="slds-col slds-size_1-of-3"></div>
+                    <div class="slds-col slds-size_1-of-3 slds-text-align_center">
+                        <lightning-button label="Search Accounts In Sales Navigator" variant="brand"
+                            onclick={handleSearchSNAccountClick}>
+                        </lightning-button>
+                        <lightning-button label="Reset" variant="neutral" onclick={handleSNSearchReset}
+                            class="slds-m-left_small">
+                        </lightning-button>
+                    </div>
+                    <div class="slds-col slds-size_1-of-3 slds-text-align_right">
+                        <lightning-button label="Back" variant="neutral" onclick={handleCloseSNSearchPage}>
+                        </lightning-button>
+                    </div>
+                </div>
+                <template if:true={errorMessage}>
+                    <div class="error">{errorMessage}</div>
+                </template>
+            </lightning-card>
+        </div>
+    </template>
+
+    <template if:true={showLinkedInAccountsScreen}>
+        <lightning-card>
+            <div class="slds-text-align_center">
+                <h2 id="accounts-found-on-linkedin" class="slds-text-heading_medium slds-m-bottom_xx-small">
+                    Accounts Found On Sales Navigator
+                </h2>
+            </div>
+            <div class="table-container slds-m-around_medium">
+                <lightning-datatable key-field="id" data={UnipileAccountsResponse} columns={columns}
+                    onrowselection={handleUnipileAcctRowSelection} selected-rows={selectedRows}>
+                </lightning-datatable>
+
+                <template if:true={isLoading}>
+                    <div class="loader-overlay">
+                        <lightning-spinner alternative-text="Wait... Fetching Records On Sales Navigator" size="large">
+                        </lightning-spinner>
+                        <p class="spinner-message">
+                            This may take a little while. Thanks for your patience!
+                        </p>
+                    </div>
+                </template>
+
+
+            </div>
+            <div class="slds-align_absolute-center slds-p-around_xx-small">
+                <button class="slds-button slds-button_brand" onclick={handleShowCompanyDetails} disabled={isLoading}>
+                    Show Account Details
+                </button>
+                <button class="slds-button slds-button_neutral" onclick={handleBackClickLinkedInAccountsScreen}>
+                    Go Back
+                </button>
+            </div>
+        </lightning-card>
+    </template>
+
+    <template if:true={showFoundAccountScreen}>
+        <lightning-card>
+            <div class="slds-text-align_center">
+                <h2 id="accounts-found-with-table-label" class="slds-text-heading_medium slds-m-bottom_xx-small">
+                    Accounts Found
+                </h2>
+            </div>
+
+            <!-- HQ Location Filter Section -->
+            <div class="slds-m-around_medium">
+                <h2><strong>HQ Location for Sales Navigator Search</strong></h2>
+                <div class="slds-size_1-of-2">
+                    <lightning-input type="text" value={searchTerm} onchange={handleRegionSearch}
+                        placeholder="Type to search..." required></lightning-input>
+                </div>
+
+                <template if:true={filteredOptions.length}>
+                    <ul class="slds-box slds-m-top_small">
+                        <template for:each={filteredOptions} for:item="option">
+                            <li key={option.id} class="slds-p-around_x-small slds-border_bottom hover-option"
+                                onclick={handleRegionSelect} data-value={option.id} data-label={option.title}>
+                                {option.title}
+                            </li>
+                        </template>
+                    </ul>
+                </template>
+
+                <template if:true={selectedRegions.length}>
+                    <div class="slds-m-top_small slds-text-align_left">
+                        <h3>Selected Locations</h3>
+                        <ul class="slds-list_horizontal slds-wrap">
+                            <template for:each={selectedRegions} for:item="region">
+                                <span class="custom-pill" key={region.id}>
+                                    <li class="custom-pill-label slds-grid slds-grid_vertical-align-center">
+                                        {region.title}
+                                        <lightning-button-icon icon-name="utility:close" alternative-text="Remove"
+                                            variant="bare" class="slds-m-left_small custom-pill-close"
+                                            data-value={region.id} onclick={handleRegionRemove}>
+                                        </lightning-button-icon>
+                                    </li>
+                                </span>
+                            </template>
+                        </ul>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Data Table Section -->
+            <div class="slds-m-around_medium">
+                <lightning-datatable key-field="Id" data={accounts} columns={accountFoundColumn}
+                    onrowselection={handleRowSelectionSearchContacts} sorted-by={sortBy}
+                    sorted-direction={sortDirection} onsort={handleSortAccounts}>
+                </lightning-datatable>
+            </div>
+
+            <!-- Footer Buttons -->
+            <div class="slds-align_absolute-center slds-p-around_xx-small slds-text-align_center">
+                <button class="slds-button slds-button_brand" onclick={handleSearchLinkedIn}>
+                    Search Accounts In Sales Navigator
+                </button>
+                <button class="slds-button slds-button_neutral" onclick={showFoundAccountScreenClose}>
+                    Back
+                </button>
+            </div>
+        </lightning-card>
+    </template>
+
+    <template if:true={showLinkedInAccountsSNScreen}>
+        <lightning-card>
+            <div class="slds-text-align_center">
+                <h2 id="accounts-found-on-SN" class="slds-text-heading_medium slds-m-bottom_xx-small">
+                    Accounts Found On Sales Navigator
+                </h2>
+            </div>
+            <div class="table-container slds-m-around_medium">
+                <lightning-datatable key-field="id" data={SalesNavigatorAccountsResponse}
+                    columns={AccountFoundOnSNcolumns} onrowselection={handleSNAcctRowSelection}
+                    selected-rows={selectedRows} sorted-by={sortBy} sorted-direction={sortDirection}
+                    onsort={handleSortData}>
+                </lightning-datatable>
+
+                <template if:true={isLoading}>
+                    <div class="loader-overlay">
+                        <lightning-spinner alternative-text="Wait... Fetching Records On Sales Navigator" size="large">
+                        </lightning-spinner>
+                        <p class="spinner-message">
+                            This may take a little while. Thanks for your patience!
+                        </p>
+                    </div>
+                </template>
+
+            </div>
+            <div class="slds-align_absolute-center slds-p-around_xx-small">
+                <button class="slds-button slds-button_brand" onclick={handleUpdateOrCreateAccount}>
+                    Update or Create Account
+                </button>
+                <button class="slds-button slds-button_neutral" onclick={handleBackClickLinkedInSNAccountsScreen}>
+                    Go Back
+                </button>
+            </div>
+        </lightning-card>
+    </template>
+
+    <template if:true={showCreatedAccountDetails}>
+        <lightning-card>
+            <div class="slds-text-align_center">
+                <h2 id="accounts-details-on-linkedin" class="slds-text-heading_medium slds-m-bottom_xx-small">
+                    Processed Accounts(Created)
+                </h2>
+            </div>
+            <div class="table-container slds-m-around_medium">
+                <lightning-datatable data={SNcompanyCreatedAccounts} columns={columns} key-field="id"
+                    selected-rows={selectedCreatedRows} onrowselection={handleRowSelectionCreated}>
+                </lightning-datatable>
+
+                <template if:true={isLoading}>
+                    <div class="loader-overlay">
+                        <lightning-spinner alternative-text="Wait... Fetching Records On Sales Navigator" size="large">
+                        </lightning-spinner>
+                        <p class="spinner-message">
+                            This may take a little while. Thanks for your patience!
+                        </p>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Processed Accounts (Updated) -->
+            <div class="slds-text-align_center slds-m-top_medium">
+                <h2 id="accounts-details-on-linkedin2" class="slds-text-heading_medium slds-m-bottom_xx-small">
+                    Processed Accounts(Updated)
+                </h2>
+            </div>
+            <div class="table-container slds-m-around_medium">
+                <lightning-datatable data={SNcompanyUpdatedAccounts} columns={columns} key-field="id"
+                    selected-rows={selectedUpdatedRows} onrowselection={handleRowSelectionUpdated}>
+                </lightning-datatable>
+
+                <template if:true={isLoading}>
+                    <div class="loader-overlay">
+                        <lightning-spinner alternative-text="Wait... Fetching Records On Sales Navigator" size="large">
+                        </lightning-spinner>
+                        <p class="spinner-message">
+                            This may take a little while. Thanks for your patience!
+                        </p>
+                    </div>
+                </template>
+            </div>
+            <div class="slds-align_absolute-center slds-p-around_xx-small">
+                <button class="slds-button slds-button_brand slds-m-right_small"
+                    onclick={handleClickSearchContactsOnSalesNavForSN} disabled={isLoading}>
+                    Search Contacts On Sales Navigator
+                </button>
+                <button class="slds-button slds-button_neutral" onclick={handleBackSNCompanyDetailsRetreived}>
+                    Back
+                </button>
+            </div>
+        </lightning-card>
+    </template>
+
+    <template if:true={showCompanyDetailsRetreived}>
+        <lightning-card>
+            <template if:true={isLoading}>
+                <div class="loader-overlay">
+                    <lightning-spinner alternative-text="Loading..." size="large"
+                        class="slds-m-around_medium"></lightning-spinner>
+                </div>
+                <p class="spinner-message">
+                    This may take a little while. Thanks for your patience!
+                </p>
+            </template>
+            <div class="slds-text-align_center">
+                <h2 id="accounts-details-on-linkedin-via" class="slds-text-heading_medium slds-m-bottom_xx-small">
+                    Retrieved Account Details From Sales Navigator
+                </h2>
+            </div>
+            <template if:true={companyDetails.length}>
+                <lightning-datatable key-field="companyId" data={companyDetails}
+                    columns={columnsRetreivedCompnayDetails} onrowselection={handleRetrievedAccountUpdate}
+                    selected-rows={selectedRows}>
+                </lightning-datatable>
+            </template>
+            <template if:false={companyDetails.length}>
+                <p class="slds-text-align_center slds-m-around_medium">No Sales Navigator Accounts Found.</p>
+            </template>
+            <div class="slds-text-align_center slds-m-top_medium">
+                <button class="slds-button slds-button_brand slds-m-right_small"
+                    onclick={handleUpdateSalesforceAccount}>
+                    Update Salesforce Account
+                </button>
+                <button class="slds-button slds-button_neutral" onclick={handleBackCompanyDetailsRetreived}>
+                    Back
+                </button>
+            </div>
+        </lightning-card>
+    </template>
+    <template if:true={showSNCompanyDetailsRetreived}>
+        <lightning-card>
+            <div class="slds-text-align_center">
+                <h2 id="accounts-details-on-SN" class="slds-text-heading_medium slds-m-bottom_xx-small">
+                    Retrieved Account Details From Sales Navigator
+                </h2>
+            </div>
+            <div class="table-container slds-m-around_medium">
+                <lightning-datatable key-field="companyId" data={SNcompanyDetails}
+                    columns={columnsRetreivedSNCompnayDetails} onrowselection={handleRetrievedSNAccountUpdate}
+                    selected-rows={selectedRows}>
+                </lightning-datatable>
+                <template if:true={isLoading}>
+                    <div class="loader-overlay">
+                        <lightning-spinner alternative-text="Wait... Retrieving Account Details From Sales Navigator"
+                            size="large">
+                        </lightning-spinner>
+                        <p class="spinner-message">
+                            This may take a little while. Thanks for your patience!
+                        </p>
+                    </div>
+                </template>
+                <template if:false={isLoading}>
+                    <template if:false={SNcompanyDetails.length}>
+                        <p class="slds-text-align_center slds-m-around_medium">
+                            No Sales Navigator Accounts Found.
+                        </p>
+                    </template>
+                </template>
+            </div>
+            <div class="slds-align_absolute-center slds-p-around_xx-small">
+                <button class="slds-button slds-button_brand" disabled={isLoading}>
+                    Update/Create Salesforce Account
+                </button>
+                <button class="slds-button slds-button_neutral">
+                    Back
+                </button>
+            </div>
+        </lightning-card>
+    </template>
+
+
+    <template if:true={showUpdatedAccount}>
+        <lightning-card>
+            <div class="slds-text-align_center">
+                <h2 id="accounts-updated-in-salesforce" class="slds-text-heading_medium slds-m-bottom_xx-small">
+                    Updated Account Details In Salesforce
+                </h2>
+            </div>
+            <template if:true={upDatedAccountInSalesforce.length}>
+                <lightning-datatable key-field="Id" data={upDatedAccountInSalesforce} columns={updatedAccountColumns}
+                    hide-checkbox-column="true" show-row-number-column="true">
+                </lightning-datatable>
+            </template>
+            <template if:true={isLoading}>
+                <div class="loader-overlay">
+                    <lightning-spinner alternative-text="Wait... Updating Account Details In Salesforce" size="large">
+                    </lightning-spinner>
+                    <p class="spinner-message">
+                        This may take a little while. Thanks for your patience!
+                    </p>
+                </div>
+            </template>
+            <template if:false={isLoading}>
+                <template if:false={upDatedAccountInSalesforce.length}>
+                    <p class="slds-text-align_center slds-m-around_medium">No Accounts Updated.</p>
+                </template>
+            </template>
+
+            <div class="slds-text-align_center slds-m-top_medium">
+                <button class="slds-button slds-button_brand" onclick={handleClickSearchContactsOnSalesNav}
+                    disabled={isLoading}>
+                    Search Contacts On Sales Navigator
+                </button>
+                <button class="slds-button slds-button_neutral" onclick={handleCloseShowUpdatedAccount}>
+                    Back
+                </button>
+            </div>
+        </lightning-card>
+    </template>
+
+    <template if:true={isModalOpen}>
+        <lightning-card class="slds-text-align_center slds-m-around_medium" title="Filters for Searching Contacts">
+            <template if:true={isLoading}>
+                <div class="loader-overlay">
+                    <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+                    <p class="spinner-message">
+                        This may take a little while. Thanks for your patience!
+                    </p>
+                </div>
+            </template>
+            <div class="slds-m-around_medium">
+                <lightning-dual-listbox name="Seniority Level" label="Seniority Level" source-label="Available"
+                    selected-label="Selected" options={seniorityLevelOptions} value={selectedSeniorityLevel}
+                    onchange={handleSeniorityLevelChange}>
+                </lightning-dual-listbox>
+                <lightning-dual-listbox name="Department" label="Department" source-label="Available"
+                    selected-label="Selected" options={departmentOptions} value={selectedDepartment}
+                    onchange={handleDepartmentChange}>
+                </lightning-dual-listbox>
+
+                <div class="slds-m-top_medium slds-text-align_left">
+                    <h2>Search Locations for Contacts</h2>
+                    <lightning-input type="text" label="Search" value={searchTerm} onchange={handleRegionSearch}
+                        placeholder="Type to search..."></lightning-input>
+                    <template if:true={filteredOptions.length}>
+                        <ul class="slds-box slds-m-top_small">
+                            <template for:each={filteredOptions} for:item="option">
+                                <li key={option.id} class="slds-p-around_x-small slds-border_bottom hover-option"
+                                    onclick={handleRegionSelect} data-value={option.id} data-label={option.title}>
+                                    {option.title}
+                                </li>
+                            </template>
+                        </ul>
+                    </template>
+                </div>
+                <template if:true={selectedRegions.length}>
+                    <div class="slds-m-top_small slds-text-align_left">
+                        <h3>Selected Regions</h3>
+                        <ul class="slds-list_horizontal slds-wrap">
+                            <template for:each={selectedRegions} for:item="region">
+                                <span class="custom-pill" key={region.id}>
+                                    <li class="custom-pill-label slds-grid slds-grid_vertical-align-center">
+                                        {region.title}
+                                        <lightning-button-icon icon-name="utility:close" alternative-text="Remove"
+                                            variant="bare" class="slds-m-left_small custom-pill-close"
+                                            data-value={region.id} onclick={handleRegionRemove}>
+                                        </lightning-button-icon>
+                                    </li>
+                                </span>
+                            </template>
+                        </ul>
+                    </div>
+                </template>
+
+            </div>
+            <div class="slds-m-around_medium" style="position: relative; width: 100%;">
+                <div style="position: absolute; left:0;">
+                    <lightning-button label="Cancel" variant="neutral" onclick={closeModal}>
+                    </lightning-button>
+                </div>
+                <div style="text-align: center;">
+                    <lightning-button label="Back" variant="neutral" onclick={handleBackModal}>
+                    </lightning-button>
+                    <lightning-button label="Apply" variant="brand" class="slds-m-left_small"
+                        onclick={applySelectedFilters} disabled={isApplyDisabled}>
+                    </lightning-button>
+                </div>
+            </div>
+        </lightning-card>
+    </template>
+
+    <template if:true={isSNModalOpen}>
+        <lightning-card class="slds-text-align_center slds-m-around_medium" title="Filters for Searching Contacts">
+            <template if:true={isLoading}>
+                <div class="loader-overlay">
+                    <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                    <p class="spinner-message">
+                        This may take a little while. Thanks for your patience!
+                    </p>
+                </div>
+            </template>
+            <div class="slds-m-around_medium">
+                <lightning-dual-listbox name="Seniority Level" label="Seniority Level" source-label="Available"
+                    selected-label="Selected" options={seniorityLevelOptions} value={selectedSeniorityLevel}
+                    onchange={handleSeniorityLevelChange}>
+                </lightning-dual-listbox>
+                <lightning-dual-listbox name="Department" label="Department" source-label="Available"
+                    selected-label="Selected" options={departmentOptions} value={selectedDepartment}
+                    onchange={handleDepartmentChange}>
+                </lightning-dual-listbox>
+                <div class="slds-m-top_medium slds-text-align_left">
+                    <h2>Search Locations</h2>
+                    <lightning-input type="text" label="Search" value={searchTerm} onchange={handleRegionSearch}
+                        placeholder="Type to search..."></lightning-input>
+                    <template if:true={filteredOptions.length}>
+                        <ul class="slds-box slds-m-top_small">
+                            <template for:each={filteredOptions} for:item="option">
+                                <li key={option.id} class="slds-p-around_x-small slds-border_bottom hover-option"
+                                    onclick={handleRegionSelect} data-value={option.id} data-label={option.title}>
+                                    {option.title}
+                                </li>
+                            </template>
+                        </ul>
+                    </template>
+                </div>
+                <template if:true={selectedRegions.length}>
+                    <div class="slds-m-top_small slds-text-align_left">
+                        <h3>Selected Regions</h3>
+                        <ul class="slds-list_horizontal slds-wrap">
+                            <template for:each={selectedRegions} for:item="region">
+                                <span class="custom-pill" key={region.id}>
+                                    <li class="custom-pill-label slds-grid slds-grid_vertical-align-center">
+                                        {region.title}
+                                        <lightning-button-icon icon-name="utility:close" alternative-text="Remove"
+                                            variant="bare" class="slds-m-left_small custom-pill-close"
+                                            data-value={region.id} onclick={handleRegionRemove}>
+                                        </lightning-button-icon>
+                                    </li>
+                                </span>
+                            </template>
+                        </ul>
+                    </div>
+                </template>
+            </div>
+            <div class="slds-m-around_medium" style="position: relative; width: 100%;">
+                <div style="position: absolute; left:0;">
+                    <lightning-button label="Cancel" variant="neutral" onclick={closeSNModal}>
+                    </lightning-button>
+                </div>
+                <div style="text-align: center;">
+                    <lightning-button label="Back" variant="neutral" onclick={handleBackToSearchContactModal}>
+                    </lightning-button>
+                    <lightning-button label="Apply" variant="brand" class="slds-m-left_small"
+                        onclick={applySelectedFiltersForSN} disabled={isApplyDisabled}>
+                    </lightning-button>
+                </div>
+            </div>
+        </lightning-card>
+    </template>
+
+    <template if:true={showLinkedInContactsFound}>
+        <lightning-card>
+            <div class="slds-text-align_center">
+                <h2 id="contacts-found-on-linkedin" class="slds-text-heading_medium slds-m-bottom_xx-small">
+                    Relevant Contacts Found On Sales Navigator
+                </h2>
+            </div>
+            <p class="slds-m-around_medium ">
+                <span style="color: red;">*</span>
+                <strong>Note: Select the contacts you want to add to a grid and allocate them to an outreach owner.
+                    You can align a contact only to one outreach owner.</strong>
+            </p>
+            <div class="slds-m-around_medium">
+                <div class="slds-grid slds-grid_vertical-align-center slds-grid_align-spread">
+                    <div class="slds-col slds-grid slds-grid_vertical-align-end">
+                        <div class="slds-col">
+                            <lightning-combobox name="userSelection" label="Select Contact Outreach Owner"
+                                value={selectedContactUserId} placeholder="Search for a User..." options={userOptions}
+                                class="slds-text-align_left" onchange={handleGlobalOwnerSelection}>
+                            </lightning-combobox>
+                        </div>
+                        <div class="slds-col slds-p-left_small slds-p-bottom_xxx-small">
+                            <lightning-button label="Apply" variant="brand" onclick={handleApplyOwnerSelection}>
+                            </lightning-button>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-text-align_right">
+                        <strong>Selected Contacts: {selectedContactsCount} /
+                            {searchedContactsOnLinkedIn.length}</strong>
+                    </div>
+                </div>
+                <div class="table-container slds-relative slds-m-top_large">
+                    <lightning-datatable key-field="LinkedIn_URN" data={searchedContactsOnLinkedIn}
+                        columns={contactReceivedColumns} onrowselection={handleRetrievedContactsSelection}
+                        selected-rows={selectedRowsSearchedContacts}>
+                    </lightning-datatable>
+                    <template if:true={isLoading}>
+                        <div class="loader-overlay">
+                            <lightning-spinner
+                                alternative-text="Wait... Getting Relevant Contacts Found On Sales Navigator"
+                                size="large">
+                            </lightning-spinner>
+                            <p class="spinner-message">
+                                This may take a little while. Thanks for your patience!
+                            </p>
+                        </div>
+                    </template>
+                    <template if:false={isLoading}>
+                        <template if:false={searchedContactsOnLinkedIn.length}>
+                            <p class="slds-text-align_center slds-m-around_medium">No Contacts Found.</p>
+                        </template>
+                    </template>
+                </div>
+            </div>
+            <div class="slds-text-align_center slds-m-top_medium">
+                <button class="slds-button slds-button_brand" onclick={handleImportContacts}>Import Contacts</button>
+                <button class="slds-button slds-button_neutral" onclick={handleBackToModal}>Back</button>
+            </div>
+        </lightning-card>
+    </template>
+    <template if:true={showResponseScreen}>
+        <lightning-card title="Contacts Processed">
+            <div class="slds-text-align_center">
+                <h2 class="slds-text-heading_medium slds-m-bottom_xx-small">Contacts Created In Salesforce</h2>
+            </div>
+            <template if:true={createdContactList.length}>
+                <lightning-datatable key-field="Id" data={createdContactList} columns={contactColumns}
+                    onrowselection={handleCreatedContactSelection} selected-rows={selectedRowsCreatedContacts}>
+                </lightning-datatable>
+            </template>
+
+            <template if:false={createdContactList.length}>
+                <p class="slds-text-align_center slds-m-around_medium">No new contacts were created.</p>
+            </template>
+
+            <div class="slds-text-align_center slds-m-top_large">
+                <h2 class="slds-text-heading_medium slds-m-bottom_xx-small">Contacts Updated In Salesforce</h2>
+            </div>
+            <template if:true={updatedContactList.length}>
+                <lightning-datatable key-field="Id" data={updatedContactList} columns={contactColumns}
+                    onrowselection={handleUpdatedContactSelection} selected-rows={selectedRowsUpdatedContacts}>
+                </lightning-datatable>
+            </template>
+            <template if:false={updatedContactList.length}>
+                <p class="slds-text-align_center slds-m-around_medium">No contacts were updated.</p>
+            </template>
+            <div class="slds-text-align_center slds-m-top_large">
+                <h2 class="slds-text-heading_medium slds-m-bottom_xx-small">Contacts Skipped Due To Errors</h2>
+            </div>
+
+            <template if:true={skippedContactsList.length}>
+                <lightning-card title="Skipped Contacts" icon-name="standard:contact">
+                    <div class="slds-m-around_medium">
+                        <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                            <thead>
+                                <tr>
+                                    <th>Contact Outreach Owner</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Company Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>LinkedIn Profile</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={skippedContactsList} for:item="contact">
+                                    <tr key={contact.LinkedInURN__c}>
+                                        <td>{contact.contactOutreachOwner}</td>
+                                        <td class="align-bottom slds-p-around_xx-small">
+                                            <lightning-input type="text" value={contact.FirstName}
+                                                data-id={contact.LinkedInURN__c} data-field="FirstName"
+                                                onchange={handleEdit}>
+                                            </lightning-input>
+                                        </td>
+                                        <td class="align-bottom slds-p-around_xx-small">
+                                            <lightning-input type="text" value={contact.LastName}
+                                                data-id={contact.LinkedInURN__c} data-field="LastName" required
+                                                onchange={handleEdit}>
+                                            </lightning-input>
+                                        </td>
+                                        <td class="align-bottom slds-p-around_xx-small">
+                                            <lightning-input type="text" label="Search Company"
+                                                value={contact.Current_Company_Name__c} data-id={contact.LinkedInURN__c}
+                                                onchange={handleCompanyNameChange} onfocus={handleInputFocus}
+                                                placeholder="Start typing to search for companies..."
+                                                readonly={contact.isReadOnly} required>
+                                            </lightning-input>
+                                            <template if:true={contact.filteredCompanyOptions}>
+                                                <ul
+                                                    class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid">
+                                                    <template for:each={contact.filteredCompanyOptions}
+                                                        for:item="account">
+                                                        <li class="slds-listbox__item" key={account.value}
+                                                            data-id={contact.LinkedInURN__c} data-value={account.value}
+                                                            data-label={account.label} onclick={handleSelectCompany}>
+                                                            <a href="javascript:void(0)" class="slds-truncate">
+                                                                {account.label}
+                                                            </a>
+                                                        </li>
+                                                    </template>
+                                                </ul>
+                                            </template>
+                                        </td>
+                                        <td class="align-bottom slds-p-around_xx-small">
+                                            <lightning-input type="email" value={contact.Email}
+                                                data-id={contact.LinkedInURN__c} data-field="Email"
+                                                onchange={handleEdit}>
+                                            </lightning-input>
+                                        </td>
+                                        <td class="align-bottom slds-p-around_xx-small">
+                                            <lightning-input type="phone" value={contact.Phone}
+                                                data-id={contact.LinkedInURN__c} data-field="Phone"
+                                                onchange={handleEdit}>
+                                            </lightning-input>
+                                        </td>
+                                        <td class="slds-m-top-xx_large">
+                                            <template if:true={contact.LinkedIn_Profile__c}>
+                                                <a href={contact.LinkedIn_Profile__c} target="_blank"
+                                                    rel="noopener noreferrer">
+                                                    View Profile
+                                                </a>
+                                            </template>
+                                            <template if:false={contact.LinkedIn_Profile__c}>
+                                                <span class="slds-text-color_weak">No Profile</span>
+                                            </template>
+                                        </td>
+                                        <td class="align-bottom slds-p-around_x-small">
+                                            <div class="slds-grid slds-grid_vertical-align-center">
+                                                <lightning-button label="Save" data-id={contact.LinkedInURN__c}
+                                                    onclick={handleSaveContact} disabled={contact.isSaving}>
+                                                </lightning-button>
+                                                <template if:true={contact.isEditingCompany}>
+                                                    <lightning-button label="Cancel" variant="destructive-text"
+                                                        class="slds-m-left_x-small" data-id={contact.LinkedInURN__c}
+                                                        onclick={handleCancelEdit}>
+                                                    </lightning-button>
+                                                </template>
+                                                <template if:true={contact.isSaving}>
+                                                    <lightning-spinner alternative-text="Saving..." size="small">
+                                                    </lightning-spinner>
+                                                    <p class="spinner-message">
+                                                        This may take a little while. Thanks for your patience!
+                                                    </p>
+                                                </template>
+                                                <template if:true={contact.saveError}>
+                                                    <p class="slds-text-color_error slds-m-left_small">
+                                                        {contact.saveError}
+                                                    </p>
+                                                </template>
+                                                <template if:true={contact.isSaved}>
+                                                    <lightning-icon icon-name="utility:success" alternative-text="Saved"
+                                                        title="Saved" size="small" class="slds-m-left_small">
+                                                    </lightning-icon>
+                                                </template>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </lightning-card>
+            </template>
+
+            <template if:false={skippedContactsList.length}>
+                <p class="slds-text-align_center slds-m-around_medium">No contacts were skipped.</p>
+            </template>
+
+            <template if:true={createNewGridScreen}>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+
+                <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container">
+
+                        <header class="slds-modal__header slds-modal__header_empty">
+                            <lightning-button-icon icon-name="utility:close" alternative-text="Close"
+                                variant="bare-inverse" onclick={handleCloseAddGridTemplate} class="slds-modal__close">
+                            </lightning-button-icon>
+                        </header>
+
+                        <div class="slds-modal__header slds-modal__header_center slds-p-around_medium">
+                            <h2 class="slds-text-heading_medium">Add Contacts to New Grid</h2>
+                        </div>
+
+                        <div class="slds-modal__content slds-p-horizontal_medium slds-p-vertical_small">
+                            <lightning-layout pull-to-boundary="small" multiple-rows="true">
+                                <lightning-layout-item padding="around-small" size="12" medium-device-size="6">
+                                    <lightning-input type="text" label="Grid Name" value={inputGridName}
+                                        onchange={handleGridNameInsert} placeholder="Enter the Grid Name…">
+                                    </lightning-input>
+                                </lightning-layout-item>
+
+                                <lightning-layout-item padding="around-small" size="12" medium-device-size="6">
+                                    <lightning-combobox name="userSelection" label="Grid Owner" value={selectedUserId}
+                                        placeholder="Search for a User…" options={userOptions}
+                                        onchange={handleUserChange}>
+                                    </lightning-combobox>
+                                </lightning-layout-item>
+                            </lightning-layout>
+                        </div>
+
+                        <footer class="slds-modal__footer">
+                            <lightning-button variant="neutral" label="Cancel" onclick={handleCloseAddGridTemplate}
+                                class="slds-m-right_small">
+                            </lightning-button>
+                            <lightning-button variant="brand" label="Add To New Grid"
+                                onclick={handleSelectedContactsAddToGrid}>
+                            </lightning-button>
+                        </footer>
+                    </div>
+                </section>
+            </template>
+
+            <template if:true={addConExistingGrid}>
+                <!-- Modal backdrop -->
+                <div class="slds-backdrop slds-backdrop_open"></div>
+
+                <!-- Modal container -->
+                <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container">
+
+                        <!-- HEADER: Close button -->
+                        <header class="slds-modal__header slds-modal__header_empty">
+                            <lightning-button-icon icon-name="utility:close" alternative-text="Close"
+                                variant="bare-inverse" onclick={handleCloseAddGridTemplate} class="slds-modal__close">
+                            </lightning-button-icon>
+                        </header>
+
+                        <!-- HEADER: Title -->
+                        <div class="slds-modal__header slds-modal__header_center slds-p-around_medium">
+                            <h2 class="slds-text-heading_medium">Add Contacts to Existing Grid</h2>
+                        </div>
+
+                        <!-- BODY: Form -->
+                        <div class="slds-modal__content slds-p-horizontal_medium slds-p-vertical_small">
+                            <lightning-layout pull-to-boundary="small">
+                                <lightning-layout-item padding="around-small" size="12" medium-device-size="8">
+                                    <lightning-combobox name="existingGrid" label="Select Existing Grid"
+                                        value={selectedGrid} placeholder="Choose Grid…" options={gridSuggestions}
+                                        onchange={handleGridSelect}>
+                                    </lightning-combobox>
+                                </lightning-layout-item>
+                            </lightning-layout>
+                        </div>
+
+                        <!-- FOOTER: Actions -->
+                        <footer class="slds-modal__footer">
+                            <lightning-button variant="neutrald" label="Cancel" onclick={handleCloseAddGridTemplate}
+                                class="slds-m-right_small">
+                            </lightning-button>
+                            <lightning-button variant="brand" label="Add To Existing Grid"
+                                onclick={handleSelectedContactsAddToExistingGrid}>
+                            </lightning-button>
+                        </footer>
+                    </div>
+                </section>
+            </template>
+
+
+            <div class="slds-p-left_medium slds-grid slds-wrap slds-gutters">
+            </div>
+
+            <div slot="footer" class="slds-size_1-of-1 slds-m-top_large slds-grid slds-grid_align-spread">
+
+                <div>
+                    <lightning-button variant="neutral" label="Back" onclick={handleBackForContactsProccessed}>
+                    </lightning-button>
+                </div>
+
+                <div class="slds-col slds-size_1-of-2">
+                    <lightning-button variant="brand-outlined" label="Add to New Grid" onclick={handleAddToNewGrid}
+                        class="slds-m-right_small">
+                    </lightning-button>
+                    <lightning-button variant="brand-outlined" label="Add to Existing Grid"
+                        onclick={handleAddToExistingGrid} class="slds-m-left_small">
+                    </lightning-button>
+                </div>
+
+                <div class="slds-grid slds-gutters">
+                    <lightning-button variant="brand-outlined" label="Go to Working Table"
+                        onclick={handleGoToWorkingTable} class="slds-m-right_small">
+                    </lightning-button>
+                    <lightning-button variant="destructive-text" label="Close" onclick={handleCloseResponseScreen}>
+                    </lightning-button>
+                </div>
+            </div>
+
+        </lightning-card>
+    </template>
+
+    <template if:true={showConfirmationModal}>
+        <section role="dialog" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container"
+                style="width: fit-content; max-width: 90vw; margin: auto; position: relative;">
+                <header class="slds-modal__header">
+                    <h2 class="slds-text-heading_medium">LinkedIn Connect invitation</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium">
+                    <div class="slds-p-around_medium">
+                        <p>
+                            <strong class="slds-m-bottom_small">Grid Name: {gridName}</strong>
+                        </p>
+                        <template if:true={accountList.length}>
+                            <strong class="slds-m-bottom_small">Accounts:</strong>
+                            <ol class="slds-list_ordered">
+                                <template for:each={accountList} for:item="account" for:index="index">
+                                    <li class="slds-m-bottom_xx-small" key={account.id}>
+                                        <span class="slds-text-body_regular">{account.name}</span>
+                                    </li>
+                                </template>
+                            </ol>
+                        </template>
+                    </div>
+
+                    <lightning-datatable key-field="id" data={contactList} columns={gridContactColumns}
+                        hide-checkbox-column="true" show-row-number-column="true"
+                        class="slds-m-top_medium slds-m-bottom_medium slds-table slds-table_bordered slds-table_striped"></lightning-datatable>
+
+                    <template if:true={isMoreThan100}>
+                        <p>
+                            You have added <strong>{contactList.length}</strong> contacts.
+                            Due to platform limits, we can only send invitations to the first <strong>100</strong>
+                            contacts.
+                            Do you want to proceed with sending invites to the first 100 contacts?
+                        </p>
+                    </template>
+                    <template if:false={isMoreThan100}>
+                        <p class="slds-text-align_center">
+                            You have added <strong>{contactList.length}</strong> contacts.
+                            Do you want to send invitations to all of them now?
+                        </p>
+                    </template>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button variant="neutral" label="Back" onclick={handleCancel}></lightning-button>
+                    <lightning-button variant="brand" class="slds-m-left_small" label="Yes, Send Invites"
+                        onclick={handleConfirm}></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <template if:true={isProcessing}>
+        <div class="slds-spinner_container slds-is-fixed">
+            <div class="slds-spinner slds-spinner_large slds-spinner_brand" role="status">
+                <span class="slds-assistive-text">Sending Invitations...</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+            <p class="spinner-message">
+                This may take a little while. Thanks for your patience!
+            </p>
+        </div>
+    </template>
+</template>

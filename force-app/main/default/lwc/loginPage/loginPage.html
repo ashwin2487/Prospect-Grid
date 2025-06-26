@@ -1,0 +1,54 @@
+<template>
+    <lightning-card title="Step 1 : Connect Accounts">
+        <div class="slds-p-around_medium">
+            <!-- Success/Error Message -->
+            <template if:true={successMessage}>
+                <div class="slds-text-color_success slds-m-top_large">
+                    {successMessage}
+                </div>
+            </template>
+
+            <template if:true={errorMessage}>
+                <div class="slds-text-color_error slds-m-top_large">
+                    {errorMessage}
+                </div>
+            </template>
+
+            <!-- Button Row -->
+            <div class="slds-m-top_medium slds-grid slds-gutters slds-align_absolute-center">
+                <div class="slds-p-horizontal_small" style="min-width: 160px;">
+                    <button
+                    onclick={connectToLinkedIn}
+                    class="nowrap-label slds-button slds-button_brand"
+                    disabled={isDisabledLinkedin}
+                >
+                    Connect LinkedIn
+                </button>
+                </div>
+                
+                <div class="slds-p-horizontal_small" style="min-width: 160px;">
+                    <button
+                        onclick={connectToGmail}
+                        class="nowrap-label slds-button slds-button_brand"
+                        disabled={isDisabledGoogle}>
+                        Connect Gmail
+                    </button>
+                </div>
+
+                <div class="slds-p-horizontal_small" style="min-width: 160px;">
+                    <button
+                        onclick={connectToOutlook}
+                        class="nowrap-label slds-button slds-button_neutral"
+                        disabled={isDisabledOutlook}>
+                        Connect Outlook
+                    </button>
+                </div>
+            </div>
+
+            <!-- Optional Spinner -->
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Processing..." size="small"></lightning-spinner>
+            </template>
+        </div>
+    </lightning-card>
+</template>

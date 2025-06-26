@@ -1,0 +1,17 @@
+.slds-p-around_medium {
+    width: 300px;
+    margin: 0 auto;
+}
+
+.slds-card {
+    max-width: 350px;
+}
+
+.slds-text-color_error {
+    color: red;
+    font-size: 14px;
+}
+
+button[disabled] {
+    cursor: not-allowed;
+}

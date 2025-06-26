@@ -1,0 +1,40 @@
+<template>
+    <lightning-card title="Step 2: Enable Connected Account Event Tracking">
+        <div class="slds-p-around_medium">
+            <template if:true={isLinkedInCreated}>
+            <button class="slds-button slds-button_brand" onclick={handleCreateLinkedInWebhook}
+                disabled={isLinkedTrackingEnabled}>
+                Enable LinkedIn Tracking
+            </button>
+        </template>
+
+            <template if:true={isGoogleCreated}>
+
+                <button class="slds-m-left_small slds-button slds-button_brand"
+                    onclick={handleCreateSentEmailTrackingWebhook} disabled={isSentEmailTrackingEnabled}>
+                    Enable Google Sent Email Tracking
+                </button>
+
+                <button class="slds-m-left_small slds-button slds-button_brand"
+                    onclick={handleCreateReceivedEmailWebhook} disabled={isReceiveEmailTrackingEnabled}>
+                    Enable Google Received Email Tracking
+                </button>
+            </template>
+
+            <template if:true={isOutlookCreated}>
+                <button class="slds-m-left_small slds-button slds-button_brand"
+                    onclick={handleCreateSentOutlookEmailTrackingWebhook} disabled={isSentEmailOutlookTrackingEnabled}>
+                    Enable Outlook Sent Email Tracking
+                </button>
+
+                <button class="slds-m-left_small slds-button slds-button_brand"
+                    onclick={handleCreateReceivedEmailOutlookWebhook} disabled={isReceiveEmailOutlookTrackingEnabled}>
+                    Enable Outlook Received Email Tracking
+                </button>
+            </template>
+            <template if:true={responseMessage}>
+                <p class="slds-m-top_medium">{responseMessage}</p>
+            </template>
+        </div>
+    </lightning-card>
+</template>
